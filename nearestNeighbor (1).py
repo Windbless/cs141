@@ -31,10 +31,7 @@ def divideAndConquerNearestNeighbor(points):
     Rx = points1[mid:]
     midpoint = points1[mid][0]
     
-    for i in range(len(points1)){
-        if
-    }
-    
+   
     
     
     
