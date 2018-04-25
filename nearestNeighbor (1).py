@@ -14,30 +14,48 @@ parser.add_argument('--profile',action='store_true')
 parser.add_argument('filename',metavar='<filename>',\
     help='Input dataset of points')
 #help function to help to calcualte the distance between the two point
+def sortthepoint(points):
+    points1 = sorted(points,key = lambda xp:[xp[0],xp[1]])   
+    return points1
+
 def distance(p1,p2):
-    return ( (p1.x - p2.x) * (p1.x- p2.x) + (p1.y - p2.y) * (p1.y - p2.y) ) ** 0.5 
+    return ( (p1[0] - p2[0]) * (p1[0]- p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) ) ** 0.5 
 
 #Divide and conquer version of the nearest neighbor algorithm
 #Input: points := unsorted array of (x,y) coordinates
 #Output: tuple of smallest distance and coordinates (distance,(x1,y1),(x2,y2))
 def divideAndConquerNearestNeighbor(points):
     size = len(points)
-    if size <= 7
-        return bruteForceNearestNeighbor(points)
-    mid = ln_ax / 2;
+    if size <= 3:
+       return bruteForceNearestNeighbor(points)
+    mid = size // 2;
     # first thing is to sort the x 
-    points1 = sorted(points,key = lambda points: points[1]) 
-    Lx = points1[:mid]
-    Rx = points1[mid:]
-    midpoint = points1[mid][0]
-    
-   
-    
-    
-    
-    minimum_distance = 0;
+    #points1 = sorted(points,key = lambda points: points[1]) 
+    Lx = points[:mid]
+    Rx = points[mid:]
+
+    # it work now
+    #for l in range(len(Lx)):
+    #    print(str(Lx[l][0]) + " "+ str(Lx[l][1]) + '\n')
+
+    #print("==============================================\n")
+    #for h in range(len(Rx)):
+     #   print(str(Rx[h][0]) + " "+ str(Rx[h][1]) + '\n')
     point1 = (-1,-1)
     point2 = (-1,-1)
+
+
+    (min1,p1,q1) = divideAndConquerNearestNeighbor(Lx)
+    (min2,p2,q2) = divideAndConquerNearestNeighbor(Rx)
+    if(min1 <= min2):
+        minimum_distance = min1
+        point1 = p1
+        point2 = q1
+    else:
+        minimum_distance = min2
+        point1 = p2
+        point2 = q1
+   
     #TODO: Complete this function
     minimum_distance = distance(point1,point2) # initialize shorestDistance
     
@@ -49,7 +67,7 @@ def divideAndConquerNearestNeighbor(points):
     #            point1, point2 = i, j
     #            minimum_distance = d 
     
-    print("Divide and Conquer algorithm is incomplete")
+    #print("Divide and Conquer algorithm is incomplete")
     return (minimum_distance,point1,point2)
 #end def divide_and_conquer(points):
 
@@ -58,11 +76,18 @@ def divideAndConquerNearestNeighbor(points):
 #   [(x,y),(x,y),...,(x,y)]
 #Output: tuple of smallest distance and coordinates (distance,(x1,y1),(x2,y2))
 def bruteForceNearestNeighbor(points):
-    minimum_distance = 0;
+    
+    minimum_distance = distance(points[0],points[1])
+    p1 = points[0]
+    q1 = points[1]
+    if len(points) == 2:
+        return(minimum_distance,p1,q1)
+
+
     point1 = (-1,-1)
     point2 = (-1,-1)
     #TODO: Complete this function
-    print("Brute force algorithm is incomplete")
+    #print("Brute force algorithm is incomplete")
     return (minimum_distance,point1,point2)
 #end def brute_force_nearest_neighbor(points):
 
@@ -71,27 +96,38 @@ def bruteForceNearestNeighbor(points):
 #Output: points := unsorted array of (x,y) coordinates
 #   [(x,y),(x,y),...,(x,y)]
 def parseFile(filename):
-    points = []
+    point = []
     f = open(filename,'r') 
     lines = f.readlines()
     for line in lines:
         coordinate = line.split(' ')
-        points.append((float(coordinate[0]),float(coordinate[1])))
-    return points
+        point.append((float(coordinate[0]),float(coordinate[1])))
+    return point
 #end def parse_file(filename):
 
 #Main
 #Input: filename  := string of the name of the test case
 #       algorithm := flag for the algorithm to run, 'a': all 'b': brute force, 'd': d and c
 def main(filename,algorithm):
-    points = parseFile(filename)
+    point = parseFile(filename)
     result = bruteForceResult = divideAndConquerResult = None
+    points = sortthepoint(point);
+
+    l = 0
+    for l in range(len(points)):
+        print(str(points[l][0]) + " "+ str(points[l][1]) + '\n')
+
     if algorithm == 'a' or algorithm == 'b':
         #TODO: Insert timing code here
-        bruteForceResult = bruteForceNearestNeighbor(points)
+        #bruteForceResult = bruteForceNearestNeighbor(points)
+        minimum_distance,point1,point2 = bruteForceNearestNeighbor(points)
+
+        print(str(minimum_distance) + " " + str(point1[0]) + " "+ str(point1[1]) + '\n')
+
     if algorithm == 'a' or algorithm == 'd':
         #TODO: Insert timing code here
         divideAndConquerResult = divideAndConquerNearestNeighbor(points)
+
     if algorithm == 'a': # Print whether the results are equal (check)
         if args.verbose:
             print('Brute force result: '+str(bruteForceResult))
