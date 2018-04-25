@@ -21,6 +21,37 @@ def sortthepoint(points):
 def distance(p1,p2):
     return ( (p1[0] - p2[0]) * (p1[0]- p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) ) ** 0.5 
 
+
+def findCloseINmide(points,mid,minimum_distance):
+    # get points between mid-d and mid+d
+
+    midpointXvalue = points[mid][0] # get the x value 
+    lowbone = midpointXvalue - minimum_distance
+    upbone = midpointXvalue + minimum_distance
+    lowplace = 0
+    upplace = len(points) - 1 
+    while points[lowplace][0] < lowbone:
+        lowplace = lowplace + 1
+    while points[upplace][0] > upbone:
+        upplace = upplace - 1 
+
+    points1 = points[lowplace:upplace]    
+
+    points1 = sorted(points1,key = lambda y:[y[1],y[0]])
+
+    point1 = (-1,-1)
+    point2 = (-1,-1)
+    for i in range (len(points1)):
+        for j in range (i+1, min(i+7,len(points1))):
+            if ((points[j][1]-points[i][1]) < minimum_distance):# in y we max is 7 and different is less d = min
+                d = distance(points1[i],points1[j])
+                if(d < minimum_distance):
+                    d = minimum_distance
+                    point1 = points1[i]
+                    point2 = points1[j]
+
+    return (minimum_distance,point1,point2)
+
 #Divide and conquer version of the nearest neighbor algorithm
 #Input: points := unsorted array of (x,y) coordinates
 #Output: tuple of smallest distance and coordinates (distance,(x1,y1),(x2,y2))
@@ -48,17 +79,24 @@ def divideAndConquerNearestNeighbor(points):
     (min1,p1,q1) = divideAndConquerNearestNeighbor(Lx)
     (min2,p2,q2) = divideAndConquerNearestNeighbor(Rx)
     if(min1 <= min2):
-        minimum_distance = min1
+        mn = min1
         point1 = p1
         point2 = q1
     else:
-        minimum_distance = min2
+        mn = min2
         point1 = p2
         point2 = q1
-   
-    #TODO: Complete this function
-    minimum_distance = distance(point1,point2) # initialize shorestDistance
     
+   #now we got the d = min(dl,dr) we had to make other function to check mid-point - d and mid-point + d 
+   # we have already sort the x of points so just
+   # this findcloseINmide() jusr input points and mid size and d
+    (min1,p1,p2) = findCloseINmide(points,mid,mn)
+    #
+    if(min1 < mn):
+        return(min1,p1,p2)
+    else:
+        return (mn,point1,point2)
+
     # it is jusr bad way to find the distance because it had go through the whole list 
     #for i in range(len(points)): 
     #    for j in range(i + 1, len(points)):
@@ -68,7 +106,7 @@ def divideAndConquerNearestNeighbor(points):
     #            minimum_distance = d 
     
     #print("Divide and Conquer algorithm is incomplete")
-    return (minimum_distance,point1,point2)
+    
 #end def divide_and_conquer(points):
 
 #Brute force version of the nearest neighbor algorithm
@@ -86,6 +124,17 @@ def bruteForceNearestNeighbor(points):
 
     point1 = (-1,-1)
     point2 = (-1,-1)
+
+
+    for i in range(len(points)):
+        for j in range(i+1,len(points)):
+            if(i != 0 and j != 1):
+                dis = distance(points[j],points[i])
+                if(dis < minimum_distance):
+                    minimum_distance = dis
+                    point1 = points[i]
+                    point2 = points[j]
+
     #TODO: Complete this function
     #print("Brute force algorithm is incomplete")
     return (minimum_distance,point1,point2)
@@ -114,6 +163,7 @@ def main(filename,algorithm):
     points = sortthepoint(point);
 
     l = 0
+
     for l in range(len(points)):
         print(str(points[l][0]) + " "+ str(points[l][1]) + '\n')
 
@@ -122,12 +172,12 @@ def main(filename,algorithm):
         #bruteForceResult = bruteForceNearestNeighbor(points)
         minimum_distance,point1,point2 = bruteForceNearestNeighbor(points)
 
-        print(str(minimum_distance) + " " + str(point1[0]) + " "+ str(point1[1]) + '\n')
+        print("in main bruteForceResult min is " + str(minimum_distance) + " " + str(point1) + " "+ str(point2) + '\n')
 
     if algorithm == 'a' or algorithm == 'd':
         #TODO: Insert timing code here
         divideAndConquerResult = divideAndConquerNearestNeighbor(points)
-
+        print("In main the divide_and_conquer min is " + str(minimum_distance) + " " + str(point1) + " "+ str(point2) + '\n')
     if algorithm == 'a': # Print whether the results are equal (check)
         if args.verbose:
             print('Brute force result: '+str(bruteForceResult))
