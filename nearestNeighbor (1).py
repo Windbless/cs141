@@ -39,18 +39,19 @@ def findCloseINmide(points,mid,minimum_distance):
 
     points1 = sorted(points1,key = lambda y:[y[1],y[0]])
 
-    point1 = (-1,-1)
-    point2 = (-1,-1)
+    #print(str(points1))
+    point1F = (0,0)
+    point2F = (0.0)
     for i in range (len(points1)):
         for j in range (i+1, min(i+7,len(points1))):
-            if ((points[j][1]-points[i][1]) < minimum_distance):# in y we max is 7 and different is less d = min
+            if ((points1[j][1]-points1[i][1]) < minimum_distance):# in y we max is 7 and different is less d = min
                 d = distance(points1[i],points1[j])
                 if(d < minimum_distance):
-                    d = minimum_distance
-                    point1 = points1[i]
-                    point2 = points1[j]
+                    minimum_distance = d
+                    point1F = points1[i]
+                    point2F = points1[j]
 
-    return (minimum_distance,point1,point2)
+    return (minimum_distance,point1F,point2F)
 
 #Divide and conquer version of the nearest neighbor algorithm
 #Input: points := unsorted array of (x,y) coordinates
@@ -59,43 +60,42 @@ def divideAndConquerNearestNeighbor(points):
     size = len(points)
     if size <= 3:
        return bruteForceNearestNeighbor(points)
-    mid = size // 2;
+    mid = size // 2
     # first thing is to sort the x 
     #points1 = sorted(points,key = lambda points: points[1]) 
     Lx = points[:mid]
     Rx = points[mid:]
 
-    # it work now
-    #for l in range(len(Lx)):
-    #    print(str(Lx[l][0]) + " "+ str(Lx[l][1]) + '\n')
-
-    #print("==============================================\n")
-    #for h in range(len(Rx)):
-     #   print(str(Rx[h][0]) + " "+ str(Rx[h][1]) + '\n')
     point1 = (-1,-1)
     point2 = (-1,-1)
 
 
     (min1,p1,q1) = divideAndConquerNearestNeighbor(Lx)
     (min2,p2,q2) = divideAndConquerNearestNeighbor(Rx)
-    if(min1 <= min2):
+    print( "check both side " + str(min1) + " " + str(min2) + '\n')
+
+    if(min1 < min2):
         mn = min1
         point1 = p1
         point2 = q1
     else:
         mn = min2
         point1 = p2
-        point2 = q1
+        point2 = q2
+    #print("check the min in here " + str(mn) + '\n')
+    #now we got the d = min(dl,dr) we had to make other function to check mid-point - d and mid-point + d 
+    # we have already sort the x of points so just
+    # this findcloseINmide() jusr input points and mid size and d
+    (minnew,Lnew,Rnew) = findCloseINmide(points,mid,mn)
+    #print("fianl check " + str(minnew) + " " + str(Lnew) + " " + str(Rnew) +'\n')
+    if(minnew < mn):
+        mn = minnew
+        point1 = Lnew
+        point2 = Rnew
     
-   #now we got the d = min(dl,dr) we had to make other function to check mid-point - d and mid-point + d 
-   # we have already sort the x of points so just
-   # this findcloseINmide() jusr input points and mid size and d
-    (min1,p1,p2) = findCloseINmide(points,mid,mn)
-    #
-    if(min1 < mn):
-        return(min1,p1,p2)
-    else:
-        return (mn,point1,point2)
+    print("fianl check 2 " + str(mn) + " " + str(point1) + " " + str(point2) +'\n')
+
+    return (mn,point1,point2)
 
     # it is jusr bad way to find the distance because it had go through the whole list 
     #for i in range(len(points)): 
@@ -118,7 +118,7 @@ def bruteForceNearestNeighbor(points):
     minimum_distance = distance(points[0],points[1])
     p1 = points[0]
     q1 = points[1]
-    if len(points) == 2:
+    if len(points) <= 2:
         return(minimum_distance,p1,q1)
 
 
