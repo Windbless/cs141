@@ -1,4 +1,5 @@
 import math
+import time
 import argparse
 import os
 import sys
@@ -72,7 +73,7 @@ def divideAndConquerNearestNeighbor(points):
 
     (min1,p1,q1) = divideAndConquerNearestNeighbor(Lx)
     (min2,p2,q2) = divideAndConquerNearestNeighbor(Rx)
-    print( "check both side " + str(min1) + " " + str(min2) + '\n')
+    #print( "check both side " + str(min1) + " " + str(min2) + '\n')
 
     if(min1 < min2):
         mn = min1
@@ -87,15 +88,17 @@ def divideAndConquerNearestNeighbor(points):
     # we have already sort the x of points so just
     # this findcloseINmide() jusr input points and mid size and d
     (minnew,Lnew,Rnew) = findCloseINmide(points,mid,mn)
+    minimum_distancef = 0
+
     #print("fianl check " + str(minnew) + " " + str(Lnew) + " " + str(Rnew) +'\n')
     if(minnew < mn):
         mn = minnew
         point1 = Lnew
         point2 = Rnew
     
-    print("fianl check 2 " + str(mn) + " " + str(point1) + " " + str(point2) +'\n')
+    #print("fianl check 2 " + str(mn) + " " + str(point1) + " " + str(point2) +'\n')
 
-    return (mn,point1,point2)
+    return mn,point1,point2
 
     # it is jusr bad way to find the distance because it had go through the whole list 
     #for i in range(len(points)): 
@@ -162,22 +165,23 @@ def main(filename,algorithm):
     result = bruteForceResult = divideAndConquerResult = None
     points = sortthepoint(point);
 
-    l = 0
-
-    for l in range(len(points)):
-        print(str(points[l][0]) + " "+ str(points[l][1]) + '\n')
+    #print(str(points) + '\n')
 
     if algorithm == 'a' or algorithm == 'b':
         #TODO: Insert timing code here
-        #bruteForceResult = bruteForceNearestNeighbor(points)
-        minimum_distance,point1,point2 = bruteForceNearestNeighbor(points)
-
-        print("in main bruteForceResult min is " + str(minimum_distance) + " " + str(point1) + " "+ str(point2) + '\n')
+        start = time.clock()
+        bruteForceResult = bruteForceNearestNeighbor(points)
+        stop = time.clock()
+        print("Brute stop at " + str(stop - start))
+        print("in main bruteForceResult min is " + str(bruteForceResult) + '\n')
 
     if algorithm == 'a' or algorithm == 'd':
         #TODO: Insert timing code here
+        start = time.clock()
         divideAndConquerResult = divideAndConquerNearestNeighbor(points)
-        print("In main the divide_and_conquer min is " + str(minimum_distance) + " " + str(point1) + " "+ str(point2) + '\n')
+        stop = time.clock()
+        print("divide_and_conquer stop at " + str(stop- start))
+        print("In main the divide_and_conquer min is " + str(divideAndConquerResult))
     if algorithm == 'a': # Print whether the results are equal (check)
         if args.verbose:
             print('Brute force result: '+str(bruteForceResult))
